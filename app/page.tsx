@@ -1,5 +1,6 @@
 import Navbar from "./components/Navbar";
 import About from "./components/About";
+import Gallery from "./components/Gallery";
 import Support from "./components/Support";
 
 export default function Home() {
@@ -7,20 +8,17 @@ export default function Home() {
     <>
       <Navbar />
 
-      {/* Головний банер */}
       <main
-        id="home"
         className="relative h-screen bg-cover bg-center flex items-center justify-center"
         style={{
           backgroundImage: "url('/images/hero.jpg')",
         }}
       >
-        {/* Затемнення */}
         <div className="absolute inset-0 bg-black/50"></div>
 
-        {/* Текст */}
         <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight">
+
+          <h1 className="text-6xl md:text-8xl font-bold">
             Новояворівськ
           </h1>
 
@@ -28,19 +26,20 @@ export default function Home() {
             Історія. Легенди. Спільнота.
           </p>
 
-          <a href="#history">
-            <button className="mt-10 bg-blue-600 hover:bg-blue-700 px-10 py-4 rounded-xl text-lg font-semibold transition">
-              Дізнатися більше
-            </button>
-          </a>
+          <button className="mt-10 bg-blue-600 hover:bg-blue-700 px-10 py-4 rounded-xl text-lg font-semibold transition">
+            Дізнатися більше
+          </button>
+
         </div>
+
       </main>
 
-      {/* Про місто */}
       <About />
 
-      {/* Підтримати проєкт */}
+      <Gallery />
+
       <Support />
+
     </>
   );
 }
