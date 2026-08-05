@@ -1,30 +1,58 @@
+import Image from "next/image";
+
 export default function About() {
   return (
-    <section id="history" className="bg-white py-24 px-6">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-        {/* Фото */}
+    <section
+      id="history"
+      className="bg-white py-28 px-6 scroll-mt-24"
+    >
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+
         <div>
-          <img
-            src="/images/hero.jpg"
+          <Image
+            src="/images/about.jpg"
             alt="Новояворівськ"
-            className="rounded-2xl shadow-2xl"
+            width={700}
+            height={500}
+            className="rounded-3xl shadow-2xl object-cover w-full"
           />
         </div>
 
-        {/* Текст */}
         <div>
-          <h2 className="text-5xl font-bold mb-8">
+
+          <span className="text-blue-600 font-semibold uppercase tracking-[3px]">
+            Історія міста
+          </span>
+
+          <h2 className="text-5xl font-bold text-gray-900 mt-4 mb-8">
             Про Новояворівськ
           </h2>
 
-          <p className="text-lg text-gray-700 leading-9">
-            Новояворівськ — молоде місто Львівської області,
-            засноване у 1965 році. Воно виникло як місто для
-            працівників підприємства «Сірка», а сьогодні є
-            сучасним містом із власною історією, культурою
-            та активною громадою.
-          </p>
+          <div className="space-y-6 text-gray-700 text-lg leading-9">
+
+            <p>
+              Новояворівськ — молоде місто Львівської області, яке виникло
+              завдяки відкриттю великих покладів сірки та будівництву
+              Яворівського гірничо-хімічного підприємства.
+            </p>
+
+            <p>
+              Попри свій молодий вік, місто вже має власну історію,
+              традиції та особливу атмосферу. Тут поєднуються сучасні
+              житлові квартали, зелені парки, активне культурне життя та
+              працьовиті люди, які щодня розвивають свою громаду.
+            </p>
+
+            <p>
+              Сьогодні Новояворівськ є одним із найбільших міст
+              Яворівського району та продовжує змінюватися, зберігаючи
+              пам'ять про своє минуле і впевнено дивлячись у майбутнє.
+            </p>
+
+          </div>
+
         </div>
+
       </div>
     </section>
   );
