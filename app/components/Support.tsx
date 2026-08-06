@@ -1,60 +1,66 @@
+import Image from "next/image";
+
 export default function Support() {
   return (
     <section
       id="support"
-      className="bg-gray-100 py-24 px-6"
+      className="bg-gray-100 py-28 px-6 scroll-mt-24"
     >
       <div className="max-w-6xl mx-auto">
 
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold mb-6">
-            ❤️ Підтримати проєкт
+        <div className="text-center">
+
+          <div className="text-6xl mb-5">❤️</div>
+
+          <h2 className="text-5xl font-bold text-black mb-8">
+            Підтримати проєкт
           </h2>
 
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-8">
-            Nya Live — це незалежний сайт про Новояворівськ,
-            створений для жителів та гостей міста.
-            Якщо вам подобається цей проєкт і ви хочете допомогти
-            його розвитку, можете підтримати нас добровільним донатом.
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-9">
+            Nya Live — незалежний сайт про Новояворівськ.
+            Якщо вам подобається цей проєкт і ви хочете допомогти його розвитку,
+            можете підтримати нас добровільним донатом.
           </p>
+
         </div>
 
-        <div className="grid md:grid-cols-2 gap-14 items-center">
+        <div className="mt-20 grid lg:grid-cols-2 gap-14 items-center">
 
-          {/* Текст */}
-          <div>
+          <div className="bg-white rounded-3xl shadow-lg p-10">
 
-            <h3 className="text-3xl font-bold mb-6">
+            <h3 className="text-3xl font-bold text-black mb-6">
               На що підуть кошти?
             </h3>
 
-            <ul className="space-y-4 text-lg text-gray-700">
-              <li>🌐 Оплата домену</li>
-              <li>☁️ Оплата хостингу</li>
-              <li>⚙️ Розробка нових функцій</li>
-              <li>🛠️ Підтримка та розвиток сайту</li>
+            <ul className="space-y-5 text-lg text-gray-700">
+
+              <li>✅ Розвиток сайту</li>
+              <li>✅ Нові функції</li>
+              <li>✅ Форум для жителів</li>
+              <li>✅ Сервер та домен</li>
+              <li>✅ Розвиток Nya Live</li>
+
             </ul>
+
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-lg p-10 text-center">
+
+            <Image
+              src="/images/qr.png"
+              alt="QR"
+              width={300}
+              height={300}
+              className="mx-auto rounded-2xl"
+            />
 
             <a
               href="https://donatello.to/nya-live"
               target="_blank"
-              rel="noopener noreferrer"
+              className="inline-block mt-8 bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-semibold transition"
             >
-              <button className="mt-10 bg-red-600 hover:bg-red-700 transition text-white px-8 py-4 rounded-xl text-lg font-semibold">
-                ❤️ Підтримати проєкт
-              </button>
+              Підтримати онлайн
             </a>
-
-          </div>
-
-          {/* QR */}
-          <div className="flex justify-center">
-
-            <img
-              src="/images/qr.png"
-              alt="QR код"
-              className="rounded-2xl shadow-2xl w-80"
-            />
 
           </div>
 

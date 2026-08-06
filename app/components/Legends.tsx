@@ -22,29 +22,26 @@ export default function Legends() {
       <div className="max-w-7xl mx-auto">
 
         <div className="text-center mb-16">
-
           <p className="text-blue-600 uppercase tracking-[4px] font-semibold">
             Легенди
           </p>
 
-          <h2 className="text-5xl font-bold text-gray-900 mt-4">
+          <h2 className="text-5xl font-bold text-black mt-4">
             Таємниці Новояворівська
           </h2>
 
-          <p className="text-gray-600 text-lg mt-6 max-w-3xl mx-auto">
+          <p className="text-gray-700 text-lg mt-6 max-w-3xl mx-auto">
             Цікаві історії та місцеві легенди, які передаються від покоління до покоління.
           </p>
-
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-
           {legends.map((legend) => (
             <div
               key={legend.title}
-              className="bg-gray-100 rounded-3xl p-8 shadow hover:shadow-xl transition"
+              className="bg-gray-100 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition"
             >
-              <h3 className="text-2xl font-bold mb-4">
+              <h3 className="text-2xl font-bold text-black mb-4">
                 {legend.title}
               </h3>
 
@@ -53,7 +50,6 @@ export default function Legends() {
               </p>
             </div>
           ))}
-
         </div>
 
       </div>
