@@ -1,14 +1,13 @@
 import Image from "next/image";
 
 const images = [
-  { src: "/images/gallery1.jpg", title: "Новояворівськ" },
-  { src: "/images/gallery2.jpg", title: "Центральна частина міста" },
-  { src: "/images/gallery3.jpg", title: "Палац культури" },
-  { src: "/images/gallery4.jpg", title: "Озеро" },
-  { src: "/images/gallery5.jpg", title: "Парк" },
-  { src: "/images/gallery6.jpg", title: "Вечірній Новояворівськ" },
+  { src: "/images/gallery1.jpg", title: "Криве озеро" },
+  { src: "/images/gallery2.JPG", title: "Кристал" },
+  { src: "/images/gallery3.JPG", title: "Панорама Новояворівська" },
+  { src: "/images/gallery4.JPG", title: "Мурал Андрія Кузьменка (Скрябіна)" },
+  { src: "/images/gallery5.JPG", title: "Яворівський гірничо-хімічний комбінат" },
+  { src: "/images/gallery6.JPG", title: "Вулиці Новояворівська" },
 ];
-
 export default function Gallery() {
   return (
     <section className="bg-gray-50 py-28 px-6">
