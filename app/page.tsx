@@ -2,6 +2,7 @@ import Navbar from "./components/Navbar";
 import About from "./components/About";
 import Gallery from "./components/Gallery";
 import Support from "./components/Support";
+import Legends from "./components/Legends";
 
 export default function Home() {
   return (
@@ -28,6 +29,7 @@ export default function Home() {
         </section>
 
         <About />
+        <Legends />
         <Gallery />
         <Support />
 
