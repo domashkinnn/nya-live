@@ -2,15 +2,18 @@ import Image from "next/image";
 
 const images = [
   { src: "/images/gallery1.jpg", title: "Криве озеро" },
-  { src: "/images/gallery2.JPG", title: "Кристал" },
-  { src: "/images/gallery3.JPG", title: "Панорама Новояворівська" },
-  { src: "/images/gallery4.JPG", title: "Мурал Андрія Кузьменка (Скрябіна)" },
-  { src: "/images/gallery5.JPG", title: "Яворівський гірничо-хімічний комбінат" },
-  { src: "/images/gallery6.JPG", title: "Вулиці Новояворівська" },
+  { src: "/images/gallery2.jpg", title: "Кристал" },
+  { src: "/images/gallery3.jpg", title: "Панорама Новояворівська" },
+  { src: "/images/gallery4.jpg", title: "Мурал Андрія Кузьменка (Скрябіна)" },
+  { src: "/images/gallery5.jpg", title: "Яворівський гірничо-хімічний комбінат" },
+  { src: "/images/gallery6.jpg", title: "Вулиці Новояворівська" },
 ];
 export default function Gallery() {
   return (
-    <section className="bg-gray-50 py-28 px-6">
+    <section
+  id="gallery"
+  className="bg-gray-50 py-28 px-6 scroll-mt-24"
+>
       <div className="max-w-7xl mx-auto">
 
         <div className="text-center mb-16">
