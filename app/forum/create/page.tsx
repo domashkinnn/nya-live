@@ -1,202 +1,212 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
-export default function CreateTopicPage() {
+export default function CreatePostPage() {
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [nickname, setNickname] = useState("");
-
+  const [mode, setMode] = useState<"text" | "photo">("text");
+  const [caption, setCaption] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(true);
-  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    async function checkUser() {
+  function handleImageChange(file: File | null) {
+    setImage(file);
+
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      setPreview("");
+    }
+  }
+
+  async function createPost() {
+    if (!caption.trim() && !image) {
+      alert("Напиши текст або додай фото.");
+      return;
+    }
+
+    if (mode === "photo" && !image) {
+      alert("Додай фотографію.");
+      return;
+    }
+
+    if (mode === "text" && image) {
+      setImage(null);
+      setPreview("");
+    }
+
+    setLoading(true);
+
+    try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (!user) {
+        alert("Спочатку увійди в акаунт.");
         router.push("/login");
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("nickname")
-        .eq("id", user.id)
-        .single();
+      let imageUrl: string | null = null;
 
-      setNickname(profile?.nickname || "Користувач");
-      setChecking(false);
-    }
+      if (mode === "photo" && image) {
+        const extension = image.name.split(".").pop();
+        const fileName = `${user.id}-${Date.now()}.${extension}`;
 
-    checkUser();
-  }, [router]);
+        const { error: uploadError } = await supabase.storage
+          .from("posts")
+          .upload(fileName, image);
 
-  async function createTopic(e: FormEvent) {
-    e.preventDefault();
+        if (uploadError) {
+          console.error(uploadError);
+          alert("Не вдалося завантажити фото: " + uploadError.message);
+          return;
+        }
 
-    const cleanTitle = title.trim();
-    const cleanContent = content.trim();
+        const { data } = supabase.storage
+          .from("posts")
+          .getPublicUrl(fileName);
 
-    if (!cleanTitle || !cleanContent) {
-      setMessage("Заповни назву та текст теми.");
-      return;
-    }
+        imageUrl = data.publicUrl;
+      }
 
-    if (cleanTitle.length < 3) {
-      setMessage("Назва теми має містити мінімум 3 символи.");
-      return;
-    }
+      const { error } = await supabase.from("posts").insert({
+        user_id: user.id,
+        image_url: imageUrl,
+        caption: caption.trim() || null,
+      });
 
-    if (cleanContent.length < 3) {
-      setMessage("Текст теми має містити мінімум 3 символи.");
-      return;
-    }
+      if (error) {
+        console.error(error);
+        alert("Не вдалося створити пост: " + error.message);
+        return;
+      }
 
-    setLoading(true);
-    setMessage("");
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("nickname")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile) {
-      setMessage("Профіль користувача не знайдено.");
+      router.push("/forum");
+      router.refresh();
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { data, error } = await supabase
-      .from("topics")
-      .insert({
-        title: cleanTitle,
-        content: cleanContent,
-        author: profile.nickname,
-        author_id: user.id,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      setMessage(error.message);
-      setLoading(false);
-      return;
-    }
-
-    router.push(`/forum/${data.id}`);
-  }
-
-  if (checking) {
-    return (
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-gray-700 text-lg">
-          Перевірка акаунта...
-        </p>
-      </main>
-    );
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 px-4 py-10">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-gray-100">
+      <section className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white">
+        <div className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14">
+          <Link
+            href="/forum"
+            className="mb-6 inline-block text-white/90 hover:text-white"
+          >
+            ← Назад на форум
+          </Link>
 
-        <Link
-          href="/forum"
-          className="text-gray-700 hover:text-blue-600 font-semibold transition"
-        >
-          ← Назад до форуму
-        </Link>
-
-        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10 mt-6">
-
-          <h1 className="text-4xl font-bold text-gray-900">
-            Створити тему
+          <h1 className="text-4xl font-bold sm:text-5xl">
+            Створити пост
           </h1>
 
-          <p className="text-gray-600 mt-3">
-            Поділися думкою, історією або питанням про Новояворівськ.
+          <p className="mt-3 text-lg text-white/90">
+            Поділися думкою або фотографією з Новояворівська.
           </p>
+        </div>
+      </section>
 
-          <div className="mt-6 bg-gray-100 rounded-xl px-5 py-4">
-            <span className="text-gray-700">
-              Ви пишете як{" "}
-            </span>
-
-            <span className="font-bold text-blue-600">
-              {nickname}
-            </span>
-          </div>
-
-          <form onSubmit={createTopic} className="space-y-6 mt-8">
-
-            <div>
-              <label className="block text-gray-900 font-bold mb-2">
-                Назва теми
-              </label>
-
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Введи назву теми"
-                maxLength={100}
-                className="w-full border border-gray-300 rounded-xl px-4 py-4 text-gray-900 outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-900 font-bold mb-2">
-                Текст
-              </label>
-
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Напиши щось цікаве..."
-                maxLength={5000}
-                rows={8}
-                className="w-full border border-gray-300 rounded-xl px-4 py-4 text-gray-900 outline-none focus:border-blue-500 resize-none"
-              />
-            </div>
-
-            {message && (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
-                {message}
-              </div>
-            )}
-
+      <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="rounded-3xl bg-white p-5 shadow-lg sm:p-8">
+          <div className="grid grid-cols-2 gap-3">
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-4 rounded-xl transition"
+              onClick={() => {
+                setMode("text");
+                setImage(null);
+                setPreview("");
+              }}
+              className={`rounded-xl px-4 py-3 font-bold transition ${
+                mode === "text"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
-              {loading ? "Публікація..." : "Опублікувати тему"}
+              📝 Текст
             </button>
 
-          </form>
+            <button
+              onClick={() => setMode("photo")}
+              className={`rounded-xl px-4 py-3 font-bold transition ${
+                mode === "photo"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              📸 Фото
+            </button>
+          </div>
 
+          {mode === "photo" && (
+            <div className="mt-6">
+              <label className="mb-2 block font-bold text-gray-900">
+                Фотографія
+              </label>
+
+              <label className="flex min-h-40 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-5 text-center hover:bg-gray-100">
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt="Попередній перегляд"
+                    className="max-h-80 max-w-full rounded-xl object-contain"
+                  />
+                ) : (
+                  <div>
+                    <div className="text-5xl">📷</div>
+                    <p className="mt-2 font-semibold text-gray-700">
+                      Натисни, щоб вибрати фото
+                    </p>
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    handleImageChange(e.target.files?.[0] || null)
+                  }
+                />
+              </label>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <label className="mb-2 block font-bold text-gray-900">
+              {mode === "text" ? "Текст поста" : "Опис"}
+            </label>
+
+            <textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder={
+                mode === "text"
+                  ? "Напиши щось..."
+                  : "Напиши опис до фотографії..."
+              }
+              rows={6}
+              className="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 p-4 text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white"
+            />
+          </div>
+
+          <button
+            onClick={createPost}
+            disabled={loading}
+            className="mt-6 w-full rounded-2xl bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Публікуємо..." : "Опублікувати"}
+          </button>
         </div>
-
-      </div>
+      </section>
     </main>
   );
 }

@@ -10,37 +10,31 @@ export default function Home() {
     <>
       <Navbar />
 
-      <main>
-
+      <main className="w-full overflow-x-hidden">
         <section
-          className="relative h-screen bg-cover bg-center flex items-center justify-center"
+          className="relative min-h-[75vh] sm:min-h-[85vh] lg:h-screen bg-cover bg-center flex items-center justify-center px-5"
           style={{
             backgroundImage: "url('/images/hero.jpg')",
           }}
         >
           <div className="absolute inset-0 bg-black/45"></div>
 
-          <div className="relative text-center text-white z-10">
-            <h1 className="text-7xl font-bold">Новояворівськ</h1>
+          <div className="relative z-10 text-center text-white max-w-4xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              Новояворівськ
+            </h1>
 
-            <p className="text-2xl mt-4">
+            <p className="text-lg sm:text-xl md:text-2xl mt-4 px-2">
               Історія. Легенди. Спільнота.
             </p>
-
           </div>
-
         </section>
 
         <About />
-
         <Legends />
-
         <FamousPeople />
-
         <Gallery />
-
         <Support />
-
       </main>
     </>
   );
