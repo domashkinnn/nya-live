@@ -15,37 +15,35 @@ export default function Legends() {
   ];
 
   return (
-    <section
-      id="legends"
-      className="bg-white py-28 px-6 scroll-mt-24"
-    >
+    <section className="py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
 
-        <div className="text-center mb-16">
-          <p className="text-blue-600 uppercase tracking-[4px] font-semibold">
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-blue-600 uppercase tracking-[4px] font-semibold text-sm md:text-base">
             Легенди
           </p>
 
-          <h2 className="text-5xl font-bold text-black mt-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-black mt-4">
             Таємниці Новояворівська
           </h2>
 
-          <p className="text-gray-700 text-lg mt-6 max-w-3xl mx-auto">
-            Цікаві історії та місцеві легенди, які передаються від покоління до покоління.
+          <p className="text-gray-700 text-base md:text-lg mt-5 md:mt-6 max-w-3xl mx-auto leading-7 md:leading-8">
+            Цікаві історії та місцеві легенди, які передаються від покоління
+            до покоління.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {legends.map((legend) => (
             <div
               key={legend.title}
-              className="bg-gray-100 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition"
+              className="bg-gray-100 rounded-3xl p-6 md:p-8 shadow-lg hover:shadow-2xl transition"
             >
               <h3 className="text-2xl font-bold text-black mb-4">
                 {legend.title}
               </h3>
 
-              <p className="text-gray-700 leading-8">
+              <p className="text-gray-700 leading-7 md:leading-8">
                 {legend.text}
               </p>
             </div>
