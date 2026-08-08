@@ -1,8 +1,9 @@
 import Navbar from "./components/Navbar";
 import About from "./components/About";
+import Legends from "./components/Legends";
+import FamousPeople from "./components/FamousPeople";
 import Gallery from "./components/Gallery";
 import Support from "./components/Support";
-import Legends from "./components/Legends";
 
 export default function Home() {
   return (
@@ -11,7 +12,6 @@ export default function Home() {
 
       <main>
 
-        {/* Головний екран */}
         <section
           className="relative h-screen bg-cover bg-center flex items-center justify-center"
           style={{
@@ -22,15 +22,23 @@ export default function Home() {
 
           <div className="relative text-center text-white z-10">
             <h1 className="text-7xl font-bold">Новояворівськ</h1>
+
             <p className="text-2xl mt-4">
               Історія. Легенди. Спільнота.
             </p>
+
           </div>
+
         </section>
 
         <About />
+
         <Legends />
+
+        <FamousPeople />
+
         <Gallery />
+
         <Support />
 
       </main>
