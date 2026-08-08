@@ -2,9 +2,11 @@ import Image from "next/image";
 
 export default function About() {
   return (
-    <section id="history" className="py-16 md:py-24 px-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-
+    <section
+      id="about"
+      className="bg-white py-28 px-6 scroll-mt-24"
+    >
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         <div>
           <Image
             src="/images/about.jpg"
@@ -16,16 +18,15 @@ export default function About() {
         </div>
 
         <div>
-          <span className="text-blue-600 font-semibold uppercase tracking-[3px] text-sm md:text-base">
+          <span className="text-blue-600 font-semibold uppercase tracking-[3px]">
             Історія міста
           </span>
 
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6 md:mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-8">
             Про Новояворівськ
           </h2>
 
-          <div className="space-y-5 md:space-y-6 text-gray-700 text-base md:text-lg leading-7 md:leading-9">
-
+          <div className="space-y-6 text-gray-700 text-lg leading-9">
             <p>
               Новояворівськ — молоде місто Львівської області, яке виникло
               завдяки відкриттю великих покладів сірки та будівництву
@@ -44,10 +45,8 @@ export default function About() {
               Яворівського району та продовжує змінюватися, зберігаючи
               пам&apos;ять про своє минуле і впевнено дивлячись у майбутнє.
             </p>
-
           </div>
         </div>
-
       </div>
     </section>
   );
