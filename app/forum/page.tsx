@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
+const ADMIN_IDS = [
+  "f3f8673d-faf6-4ada-bf41-052179d4e3c9",
+  "1c2c459f-8a16-43e2-aa23-e988f4dccd85",
+  "4146df2f-36be-4de0-b5ed-1c30eca2c997",
+];
+
 type Post = {
   id: string;
   user_id: string;
@@ -15,6 +21,7 @@ type Post = {
 type Profile = {
   id: string;
   nickname: string;
+  avatar_url: string | null;
 };
 
 export default function ForumPage() {
@@ -32,9 +39,7 @@ export default function ForumPage() {
       setUser(session?.user || null);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   async function loadData() {
@@ -46,13 +51,13 @@ export default function ForumPage() {
 
     setUser(user);
 
-    const { data: postsData, error } = await supabase
+    const { data: postsData, error: postsError } = await supabase
       .from("posts")
       .select("id, user_id, caption, image_url, created_at")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error(error);
+    if (postsError) {
+      console.error(postsError);
       setLoading(false);
       return;
     }
@@ -65,21 +70,29 @@ export default function ForumPage() {
     ];
 
     if (userIds.length > 0) {
-      const { data: profilesData } = await supabase
+      const { data: profilesData, error } = await supabase
         .from("profiles")
-        .select("id, nickname")
+        .select("id, nickname, avatar_url")
         .in("id", userIds);
 
-      const profileMap: Record<string, Profile> = {};
+      if (error) {
+        console.error(error);
+      }
+
+      const map: Record<string, Profile> = {};
 
       profilesData?.forEach((profile) => {
-        profileMap[profile.id] = profile;
+        map[profile.id] = profile;
       });
 
-      setProfiles(profileMap);
+      setProfiles(map);
     }
 
     setLoading(false);
+  }
+
+  function isAdmin(id: string) {
+    return ADMIN_IDS.includes(id);
   }
 
   async function logout() {
@@ -87,24 +100,29 @@ export default function ForumPage() {
     setUser(null);
   }
 
-  async function deletePost(postId: string, postUserId: string) {
-    if (!user || user.id !== postUserId) {
+  async function deletePost(postId: string, postOwnerId: string) {
+    if (!user) return;
+
+    const admin = isAdmin(user.id);
+    const owner = user.id === postOwnerId;
+
+    if (!admin && !owner) {
+      alert("У тебе немає прав для видалення цього поста.");
       return;
     }
 
-    const confirmed = confirm(
-      "Ти точно хочеш видалити цей пост?"
-    );
+    if (!confirm("Точно видалити цей пост?")) return;
 
-    if (!confirmed) {
-      return;
-    }
-
-    const { error } = await supabase
+    let query = supabase
       .from("posts")
       .delete()
-      .eq("id", postId)
-      .eq("user_id", user.id);
+      .eq("id", postId);
+
+    if (!admin) {
+      query = query.eq("user_id", user.id);
+    }
+
+    const { error } = await query;
 
     if (error) {
       alert("Не вдалося видалити пост: " + error.message);
@@ -116,21 +134,16 @@ export default function ForumPage() {
     );
   }
 
-  function getNickname(userId: string) {
-    return profiles[userId]?.nickname || "Користувач";
-  }
-
   return (
     <main className="min-h-screen bg-gray-100">
 
       {/* HEADER */}
       <section className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white">
-
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
 
           <Link
             href="/"
-            className="inline-block mb-8 text-white/90 hover:text-white transition"
+            className="mb-8 inline-block text-white/90 hover:text-white"
           >
             ← На головну
           </Link>
@@ -138,15 +151,13 @@ export default function ForumPage() {
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
 
             <div>
-
               <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl">
                 Форум Nya Live
               </h1>
 
-              <p className="mt-4 text-lg sm:text-xl text-white/90">
+              <p className="mt-4 text-lg text-white/90">
                 Обговорення життя Новояворівська.
               </p>
-
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -155,14 +166,14 @@ export default function ForumPage() {
                 <>
                   <Link
                     href="/profile"
-                    className="rounded-xl bg-white/15 px-5 py-3 font-semibold hover:bg-white/25 transition"
+                    className="rounded-xl bg-white/15 px-5 py-3 font-semibold hover:bg-white/25"
                   >
                     👤 Мій профіль
                   </Link>
 
                   <button
                     onClick={logout}
-                    className="rounded-xl bg-white px-5 py-3 font-bold text-blue-700 hover:bg-gray-100 transition"
+                    className="rounded-xl bg-white px-5 py-3 font-bold text-blue-700 hover:bg-gray-100"
                   >
                     Вийти
                   </button>
@@ -171,14 +182,14 @@ export default function ForumPage() {
                 <>
                   <Link
                     href="/login"
-                    className="rounded-xl bg-white px-5 py-3 font-bold text-blue-700 hover:bg-gray-100 transition"
+                    className="rounded-xl bg-white px-5 py-3 font-bold text-blue-700"
                   >
                     Увійти
                   </Link>
 
                   <Link
                     href="/register"
-                    className="rounded-xl bg-blue-900/50 px-5 py-3 font-bold text-white hover:bg-blue-900/70 transition"
+                    className="rounded-xl bg-blue-900/50 px-5 py-3 font-bold"
                   >
                     Зареєструватися
                   </Link>
@@ -186,51 +197,34 @@ export default function ForumPage() {
               )}
 
             </div>
-
           </div>
 
           <div className="mt-10">
-
-            {user ? (
-              <Link
-                href="/forum/create"
-                className="inline-block rounded-xl bg-white px-6 py-4 font-bold text-blue-700 hover:bg-gray-100 transition sm:px-7"
-              >
-                ➕ Створити пост
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="inline-block rounded-xl bg-white px-6 py-4 font-bold text-blue-700 hover:bg-gray-100 transition sm:px-7"
-              >
-                🔐 Увійдіть, щоб створити пост
-              </Link>
-            )}
-
+            <Link
+              href={user ? "/forum/create" : "/login"}
+              className="inline-block rounded-xl bg-white px-6 py-4 font-bold text-blue-700 hover:bg-gray-100"
+            >
+              {user
+                ? "➕ Створити пост"
+                : "🔐 Увійдіть, щоб створити пост"}
+            </Link>
           </div>
 
         </div>
-
       </section>
 
       {/* POSTS */}
       <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
 
         {loading ? (
-
           <div className="rounded-3xl bg-white p-10 text-center shadow-lg">
-            <p className="text-lg font-semibold text-gray-600">
+            <p className="font-semibold text-gray-600">
               Завантаження...
             </p>
           </div>
-
         ) : posts.length === 0 ? (
-
-          <div className="rounded-3xl bg-white p-10 text-center shadow-lg sm:p-12">
-
-            <div className="mb-5 text-6xl">
-              💬
-            </div>
+          <div className="rounded-3xl bg-white p-12 text-center shadow-lg">
+            <div className="mb-5 text-6xl">💬</div>
 
             <h2 className="text-3xl font-bold text-gray-900">
               Поки що немає постів
@@ -239,21 +233,26 @@ export default function ForumPage() {
             <p className="mt-3 text-gray-600">
               Будь першим, хто щось опублікує!
             </p>
-
           </div>
-
         ) : (
-
           <div className="space-y-6">
 
             {posts.map((post) => {
+              const profile = profiles[post.user_id];
 
-              const nickname = getNickname(post.user_id);
-              const isOwner =
-                user && user.id === post.user_id;
+              const nickname =
+                profile?.nickname || "Користувач";
+
+              const avatar =
+                profile?.avatar_url || null;
+
+              const admin = isAdmin(post.user_id);
+
+              const canDelete =
+                user &&
+                (isAdmin(user.id) || user.id === post.user_id);
 
               return (
-
                 <article
                   key={post.id}
                   className="overflow-hidden rounded-3xl bg-white shadow-lg"
@@ -264,18 +263,36 @@ export default function ForumPage() {
 
                     <Link
                       href={`/profile/${post.user_id}`}
-                      className="flex min-w-0 items-center gap-3 group"
+                      className="group flex min-w-0 items-center gap-3"
                     >
 
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-2xl transition group-hover:bg-blue-200">
-                        👤
-                      </div>
+                      {avatar ? (
+                        <img
+                          src={avatar}
+                          alt={nickname}
+                          className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-blue-100"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-2xl">
+                          👤
+                        </div>
+                      )}
 
                       <div className="min-w-0">
 
-                        <p className="truncate font-bold text-gray-900 group-hover:text-blue-600 transition">
-                          {nickname}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+
+                          <p className="truncate font-bold text-gray-900 group-hover:text-blue-600">
+                            {nickname}
+                          </p>
+
+                          {admin && (
+                            <span className="rounded-md bg-blue-600 px-2 py-0.5 text-[10px] font-extrabold text-white">
+                              АДМІН
+                            </span>
+                          )}
+
+                        </div>
 
                         <p className="text-xs text-gray-400">
                           {new Date(
@@ -287,12 +304,12 @@ export default function ForumPage() {
 
                     </Link>
 
-                    {isOwner && (
+                    {canDelete && (
                       <button
                         onClick={() =>
                           deletePost(post.id, post.user_id)
                         }
-                        className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 transition"
+                        className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-50"
                       >
                         🗑 Видалити
                       </button>
@@ -303,38 +320,31 @@ export default function ForumPage() {
                   {/* IMAGE */}
                   {post.image_url && (
                     <div className="bg-gray-50">
-
                       <img
                         src={post.image_url}
                         alt="Фото поста"
                         className="max-h-[700px] w-full object-contain"
                       />
-
                     </div>
                   )}
 
                   {/* TEXT */}
                   {post.caption && (
                     <div className="px-5 pb-6 pt-5 sm:px-6">
-
                       <p className="whitespace-pre-wrap break-words text-base leading-7 text-gray-800 sm:text-lg">
                         {post.caption}
                       </p>
-
                     </div>
                   )}
 
                 </article>
-
               );
             })}
 
           </div>
-
         )}
 
       </section>
-
     </main>
   );
 }

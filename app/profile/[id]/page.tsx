@@ -1,163 +1,148 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "../../../lib/supabase";
 
-type Post = {
+const ADMIN_IDS = [
+  "f3f8673d-faf6-4ada-bf41-052179d4e3c9",
+  "1c2c459f-8a16-43e2-aa23-e988f4dccd85",
+  "4146df2f-36be-4de0-b5ed-1c30eca2c997",
+];
+
+type Profile = {
   id: string;
-  caption: string | null;
-  image_url: string | null;
-  created_at: string;
+  nickname: string;
+  avatar_url: string | null;
 };
 
-export default function PublicProfilePage() {
+export default function UserProfilePage() {
   const params = useParams();
-  const id = params.id as string;
 
-  const [nickname, setNickname] = useState("Користувач");
-  const [posts, setPosts] = useState<Post[]>([]);
+  const id =
+    typeof params.id === "string"
+      ? params.id
+      : "";
+
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      loadProfile();
+    async function loadProfile() {
+      if (!id) return;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, nickname, avatar_url")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        console.error(error);
+        setProfile(null);
+      } else {
+        setProfile(data);
+      }
+
+      setLoading(false);
     }
+
+    loadProfile();
   }, [id]);
 
-  async function loadProfile() {
-    setLoading(true);
+  const admin = ADMIN_IDS.includes(id);
 
-    const { data: postsData } = await supabase
-      .from("posts")
-      .select("id, user_id, caption, image_url, created_at")
-      .eq("user_id", id)
-      .order("created_at", { ascending: false });
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-100">
+        <p className="font-semibold text-gray-600">
+          Завантаження...
+        </p>
+      </main>
+    );
+  }
 
-    if (postsData) {
-      setPosts(postsData);
-    }
+  if (!profile) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+        <div className="rounded-3xl bg-white p-10 text-center shadow-xl">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Користувача не знайдено
+          </h1>
 
-    if (postsData && postsData.length > 0) {
-      // Беремо нікнейм із першого поста,
-      // якщо він доступний через user metadata/профіль.
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("nickname")
-        .eq("id", id)
-        .maybeSingle();
-
-      if (profile?.nickname) {
-        setNickname(profile.nickname);
-      }
-    } else {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("nickname")
-        .eq("id", id)
-        .maybeSingle();
-
-      if (profile?.nickname) {
-        setNickname(profile.nickname);
-      }
-    }
-
-    setLoading(false);
+          <Link
+            href="/forum"
+            className="mt-6 inline-block rounded-xl bg-blue-600 px-6 py-3 font-bold text-white"
+          >
+            ← Повернутися на форум
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   return (
     <main className="min-h-screen bg-gray-100">
 
-      {/* HEADER */}
-      <section className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white">
+      <section className="bg-gradient-to-r from-blue-700 to-cyan-500 px-4 py-10 text-white sm:py-16">
 
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-3xl">
 
           <Link
             href="/forum"
-            className="inline-block mb-8 text-white/90 hover:text-white transition"
+            className="text-white/90 hover:text-white"
           >
             ← Назад на форум
           </Link>
-
-          <div className="flex flex-col sm:flex-row items-center gap-5">
-
-            <div className="w-24 h-24 rounded-full bg-white/20 border-4 border-white/40 flex items-center justify-center text-5xl">
-              👤
-            </div>
-
-            <div className="text-center sm:text-left">
-
-              <h1 className="text-4xl sm:text-5xl font-bold">
-                {nickname}
-              </h1>
-
-              <p className="mt-2 text-white/90">
-                Постів: {posts.length}
-              </p>
-
-            </div>
-
-          </div>
 
         </div>
 
       </section>
 
-      {/* POSTS */}
-      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <section className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
 
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">
-          Пости користувача
-        </h2>
+        <div className="rounded-3xl bg-white p-6 text-center shadow-xl sm:p-10">
 
-        {loading ? (
-          <div className="rounded-3xl bg-white p-8 shadow text-center text-gray-500">
-            Завантаження...
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="rounded-3xl bg-white p-8 shadow text-center text-gray-500">
-            У цього користувача ще немає постів.
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2">
+          {/* AVATAR */}
+          <div className="flex justify-center">
 
-            {posts.map((post) => (
-
-              <article
-                key={post.id}
-                className="overflow-hidden rounded-3xl bg-white shadow-lg"
-              >
-
-                {post.image_url && (
-                  <img
-                    src={post.image_url}
-                    alt="Фото поста"
-                    className="w-full max-h-[500px] object-cover"
-                  />
-                )}
-
-                <div className="p-6">
-
-                  {post.caption && (
-                    <p className="text-gray-800 whitespace-pre-wrap break-words">
-                      {post.caption}
-                    </p>
-                  )}
-
-                  <p className="mt-4 text-sm text-gray-400">
-                    {new Date(post.created_at).toLocaleString("uk-UA")}
-                  </p>
-
-                </div>
-
-              </article>
-
-            ))}
+            {profile.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={profile.nickname}
+                className="h-36 w-36 rounded-full object-cover ring-4 ring-blue-100"
+              />
+            ) : (
+              <div className="flex h-36 w-36 items-center justify-center rounded-full bg-blue-100 text-6xl">
+                👤
+              </div>
+            )}
 
           </div>
-        )}
+
+          {/* NAME */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+
+            <h1 className="text-4xl font-bold text-gray-900">
+              {profile.nickname}
+            </h1>
+
+            {admin && (
+              <span className="rounded-lg bg-blue-600 px-3 py-1 text-sm font-extrabold text-white">
+                АДМІН
+              </span>
+            )}
+
+          </div>
+
+          <p className="mt-3 text-gray-500">
+            {admin
+              ? "Адміністратор Nya Live"
+              : "Користувач Nya Live"}
+          </p>
+
+        </div>
 
       </section>
 
