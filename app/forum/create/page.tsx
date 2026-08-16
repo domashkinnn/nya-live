@@ -39,17 +39,19 @@ export default function CreatePostPage() {
       return;
     }
 
-    if (mode === "text" && image) {
-      setImage(null);
-      setPreview("");
-    }
-
     setLoading(true);
 
     try {
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.error(userError);
+        alert("Не вдалося перевірити акаунт.");
+        return;
+      }
 
       if (!user) {
         alert("Спочатку увійди в акаунт.");
@@ -77,7 +79,7 @@ export default function CreatePostPage() {
           console.error("Upload error:", uploadError);
 
           alert(
-            "Не вдалося завантажити фото: " + uploadError.message
+            "Не вдалося завантажити фото:\n" + uploadError.message
           );
 
           return;
@@ -91,43 +93,32 @@ export default function CreatePostPage() {
       }
 
       // Створення поста
-      const { error: postError } = await supabase.from("posts").insert({
-        user_id: user.id,
-        image_url: imageUrl,
-        caption: caption.trim() || null,
-      });
+      const { error: postError } = await supabase
+        .from("posts")
+        .insert({
+          user_id: user.id,
+          image_url: imageUrl,
+          caption: caption.trim() || null,
+        });
 
       if (postError) {
         console.error("Post error:", postError);
 
-        // Якщо пост не створився, але фото вже завантажилось —
-        // пробуємо видалити фото, щоб не залишати зайві файли.
-        if (mode === "photo" && image) {
-          const extension =
-            image.name.split(".").pop()?.toLowerCase() || "jpg";
-
-          // Тут видалення не робимо автоматично,
-          // щоб не ризикувати видалити неправильний файл.
-          console.log(
-            "Фото вже завантажено, але пост не створився:",
-            extension
-          );
-        }
-
         alert(
-          "Не вдалося створити пост: " + postError.message
+          "Фото завантажилось, але пост створити не вдалося:\n" +
+            postError.message
         );
 
         return;
       }
 
-      // Успішне створення
+      // Успішно
       router.push("/forum");
       router.refresh();
     } catch (error) {
       console.error(error);
 
-      alert("Сталася помилка. Спробуй ще раз.");
+      alert("Сталася непередбачена помилка.");
     } finally {
       setLoading(false);
     }
@@ -135,7 +126,6 @@ export default function CreatePostPage() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      {/* HEADER */}
       <section className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white">
         <div className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14">
           <Link
@@ -155,22 +145,15 @@ export default function CreatePostPage() {
         </div>
       </section>
 
-      {/* FORM */}
       <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="rounded-3xl bg-white p-5 shadow-lg sm:p-8">
-          {/* MODE BUTTONS */}
+          {/* Вибір типу поста */}
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => {
                 setMode("text");
-                setImage(null);
-
-                if (preview) {
-                  URL.revokeObjectURL(preview);
-                }
-
-                setPreview("");
+                handleImageChange(null);
               }}
               className={`rounded-xl px-4 py-3 font-bold transition ${
                 mode === "text"
@@ -194,7 +177,7 @@ export default function CreatePostPage() {
             </button>
           </div>
 
-          {/* PHOTO */}
+          {/* Фото */}
           {mode === "photo" && (
             <div className="mt-6">
               <label className="mb-2 block font-bold text-gray-900">
@@ -226,26 +209,17 @@ export default function CreatePostPage() {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    handleImageChange(file);
-                  }}
+                  onChange={(e) =>
+                    handleImageChange(
+                      e.target.files?.[0] || null
+                    )
+                  }
                 />
               </label>
-
-              {image && (
-                <button
-                  type="button"
-                  onClick={() => handleImageChange(null)}
-                  className="mt-3 text-sm font-semibold text-red-600 hover:text-red-700"
-                >
-                  Видалити вибране фото
-                </button>
-              )}
             </div>
           )}
 
-          {/* TEXT */}
+          {/* Текст */}
           <div className="mt-6">
             <label className="mb-2 block font-bold text-gray-900">
               {mode === "text" ? "Текст поста" : "Опис"}
@@ -264,7 +238,7 @@ export default function CreatePostPage() {
             />
           </div>
 
-          {/* SUBMIT */}
+          {/* Кнопка */}
           <button
             type="button"
             onClick={createPost}
