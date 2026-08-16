@@ -32,60 +32,93 @@ export default function FamousPeople() {
   return (
     <section
       id="people"
-      className="bg-white py-28 px-6 scroll-mt-24"
+      className="scroll-mt-24 bg-white px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28"
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-blue-600 uppercase tracking-[4px] font-semibold">
+      <div className="mx-auto max-w-7xl">
+
+        {/* HEADER */}
+
+        <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-14 lg:mb-16">
+
+          <p className="text-xs font-bold uppercase tracking-[3px] text-blue-600 sm:text-sm sm:tracking-[4px]">
             Відомі люди
           </p>
 
-          <h2 className="text-4xl md:text-5xl font-bold text-black mt-4">
+          <h2 className="mt-3 text-3xl font-black leading-tight text-black sm:mt-4 sm:text-4xl md:text-5xl">
             Люди, якими пишається Новояворівськ
           </h2>
 
-          <p className="text-gray-700 text-lg mt-6 max-w-3xl mx-auto">
+          <p className="mt-4 text-base leading-7 text-gray-600 sm:mt-6 sm:text-lg sm:leading-8">
             Новояворівськ подарував Україні талановитих музикантів,
-            спортсменів та людей, які прославили наше місто далеко за його
-            межами.
+            спортсменів та людей, які прославили наше місто далеко
+            за його межами.
           </p>
+
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {people.map((person) => (
-            <div
-              key={person.name}
-              className="bg-gray-100 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
-            >
-              <Image
-                src={person.image}
-                alt={person.name}
-                width={500}
-                height={700}
-                className="w-full h-80 sm:h-96 object-cover"
-              />
 
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-black mb-4">
+        {/* PEOPLE */}
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-8">
+
+          {people.map((person) => (
+
+            <article
+              key={person.name}
+              className="group overflow-hidden rounded-3xl bg-gray-100 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+            >
+
+              {/* PHOTO */}
+
+              <div className="relative overflow-hidden">
+
+                <Image
+                  src={person.image}
+                  alt={person.name}
+                  width={500}
+                  height={700}
+                  className="h-[380px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[420px] lg:h-80"
+                />
+
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent opacity-70" />
+
+              </div>
+
+
+              {/* TEXT */}
+
+              <div className="p-5 sm:p-6">
+
+                <h3 className="text-xl font-black leading-tight text-black sm:text-2xl">
                   {person.name}
                 </h3>
 
-                <p className="text-gray-700 leading-7">
+                <p className="mt-3 text-sm leading-6 text-gray-600 sm:text-base sm:leading-7">
                   {person.description}
                 </p>
+
               </div>
-            </div>
+
+            </article>
+
           ))}
+
         </div>
 
-        <div className="text-center mt-16">
+
+        {/* BUTTON */}
+
+        <div className="mt-10 text-center sm:mt-14 lg:mt-16">
+
           <Link
             href="/people"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold transition"
+            className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-7 py-4 text-base font-bold text-white shadow-lg transition hover:-translate-y-1 hover:bg-blue-700 sm:w-auto sm:px-10 sm:text-lg"
           >
             Переглянути всіх →
           </Link>
+
         </div>
+
       </div>
     </section>
   );
