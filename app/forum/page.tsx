@@ -138,42 +138,52 @@ export default function ForumPage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* HEADER */}
+
       <section className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
 
           <Link
             href="/"
-            className="mb-8 inline-block text-white/90 hover:text-white"
+            className="mb-6 inline-block text-sm font-medium text-white/90 transition hover:text-white sm:mb-8 sm:text-base"
           >
             ← На головну
           </Link>
 
-          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
 
-            <div>
-              <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl">
+          <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
+
+            {/* TITLE */}
+
+            <div className="min-w-0">
+
+              <h1 className="text-3xl font-black leading-tight sm:text-5xl md:text-6xl">
                 Форум Nya Live
               </h1>
 
-              <p className="mt-4 text-lg text-white/90">
+              <p className="mt-3 max-w-xl text-base leading-6 text-white/90 sm:mt-4 sm:text-lg sm:leading-7">
                 Обговорення життя Новояворівська.
               </p>
+
             </div>
 
-            <div className="flex flex-wrap gap-3">
+
+            {/* USER BUTTONS */}
+
+            <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
 
               {user ? (
                 <>
                   <Link
                     href="/profile"
-                    className="rounded-xl bg-white/15 px-5 py-3 font-semibold hover:bg-white/25"
+                    className="flex items-center justify-center rounded-xl bg-white/15 px-5 py-3 text-sm font-bold backdrop-blur transition hover:bg-white/25 sm:text-base"
                   >
                     👤 Мій профіль
                   </Link>
 
                   <button
                     onClick={logout}
-                    className="rounded-xl bg-white px-5 py-3 font-bold text-blue-700 hover:bg-gray-100"
+                    className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 transition hover:bg-gray-100 sm:text-base"
                   >
                     Вийти
                   </button>
@@ -182,14 +192,14 @@ export default function ForumPage() {
                 <>
                   <Link
                     href="/login"
-                    className="rounded-xl bg-white px-5 py-3 font-bold text-blue-700"
+                    className="flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 transition hover:bg-gray-100 sm:text-base"
                   >
                     Увійти
                   </Link>
 
                   <Link
                     href="/register"
-                    className="rounded-xl bg-blue-900/50 px-5 py-3 font-bold"
+                    className="flex items-center justify-center rounded-xl bg-blue-900/50 px-5 py-3 text-sm font-bold transition hover:bg-blue-900/70 sm:text-base"
                   >
                     Зареєструватися
                   </Link>
@@ -197,47 +207,70 @@ export default function ForumPage() {
               )}
 
             </div>
+
           </div>
 
-          <div className="mt-10">
+
+          {/* CREATE POST */}
+
+          <div className="mt-7 sm:mt-10">
+
             <Link
               href={user ? "/forum/create" : "/login"}
-              className="inline-block rounded-xl bg-white px-6 py-4 font-bold text-blue-700 hover:bg-gray-100"
+              className="flex w-full items-center justify-center rounded-xl bg-white px-6 py-4 text-center font-bold text-blue-700 shadow-lg transition hover:bg-gray-100 sm:inline-flex sm:w-auto"
             >
               {user
                 ? "➕ Створити пост"
                 : "🔐 Увійдіть, щоб створити пост"}
             </Link>
+
           </div>
 
         </div>
+
       </section>
 
+
       {/* POSTS */}
-      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+
+      <section className="mx-auto max-w-5xl px-3 py-5 sm:px-6 sm:py-10">
 
         {loading ? (
-          <div className="rounded-3xl bg-white p-10 text-center shadow-lg">
+
+          <div className="rounded-3xl bg-white p-8 text-center shadow-lg sm:p-10">
+
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+
             <p className="font-semibold text-gray-600">
               Завантаження...
             </p>
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="rounded-3xl bg-white p-12 text-center shadow-lg">
-            <div className="mb-5 text-6xl">💬</div>
 
-            <h2 className="text-3xl font-bold text-gray-900">
+          </div>
+
+        ) : posts.length === 0 ? (
+
+          <div className="rounded-3xl bg-white p-7 text-center shadow-lg sm:p-12">
+
+            <div className="mb-4 text-5xl sm:mb-5 sm:text-6xl">
+              💬
+            </div>
+
+            <h2 className="text-2xl font-black text-gray-900 sm:text-3xl">
               Поки що немає постів
             </h2>
 
-            <p className="mt-3 text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 sm:text-base">
               Будь першим, хто щось опублікує!
             </p>
+
           </div>
+
         ) : (
-          <div className="space-y-6">
+
+          <div className="space-y-4 sm:space-y-6">
 
             {posts.map((post) => {
+
               const profile = profiles[post.user_id];
 
               const nickname =
@@ -253,48 +286,61 @@ export default function ForumPage() {
                 (isAdmin(user.id) || user.id === post.user_id);
 
               return (
+
                 <article
                   key={post.id}
-                  className="overflow-hidden rounded-3xl bg-white shadow-lg"
+                  className="overflow-hidden rounded-2xl bg-white shadow-md sm:rounded-3xl sm:shadow-lg"
                 >
 
                   {/* AUTHOR */}
-                  <div className="flex items-center justify-between p-5 sm:p-6">
+
+                  <div className="flex items-start justify-between gap-3 p-4 sm:p-6">
 
                     <Link
                       href={`/profile/${post.user_id}`}
                       className="group flex min-w-0 items-center gap-3"
                     >
 
+                      {/* AVATAR */}
+
                       {avatar ? (
+
                         <img
                           src={avatar}
                           alt={nickname}
-                          className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-blue-100"
+                          className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-blue-100 sm:h-12 sm:w-12"
                         />
+
                       ) : (
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-2xl">
+
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl sm:h-12 sm:w-12 sm:text-2xl">
                           👤
                         </div>
+
                       )}
+
+
+                      {/* NAME */}
 
                       <div className="min-w-0">
 
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
 
-                          <p className="truncate font-bold text-gray-900 group-hover:text-blue-600">
+                          <p className="max-w-[180px] truncate text-sm font-bold text-gray-900 transition group-hover:text-blue-600 sm:max-w-none sm:text-base">
                             {nickname}
                           </p>
 
                           {admin && (
-                            <span className="rounded-md bg-blue-600 px-2 py-0.5 text-[10px] font-extrabold text-white">
+
+                            <span className="shrink-0 rounded-md bg-blue-600 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white sm:px-2 sm:text-[10px]">
                               АДМІН
                             </span>
+
                           )}
 
                         </div>
 
-                        <p className="text-xs text-gray-400">
+                        <p className="mt-0.5 text-[10px] text-gray-400 sm:text-xs">
                           {new Date(
                             post.created_at
                           ).toLocaleString("uk-UA")}
@@ -304,47 +350,75 @@ export default function ForumPage() {
 
                     </Link>
 
+
+                    {/* DELETE */}
+
                     {canDelete && (
+
                       <button
                         onClick={() =>
                           deletePost(post.id, post.user_id)
                         }
-                        className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-50"
+                        className="shrink-0 rounded-lg p-2 text-sm text-red-500 transition hover:bg-red-50 sm:px-3 sm:py-2 sm:text-sm"
+                        title="Видалити пост"
                       >
-                        🗑 Видалити
+                        <span className="sm:hidden">
+                          🗑️
+                        </span>
+
+                        <span className="hidden sm:inline">
+                          🗑 Видалити
+                        </span>
+
                       </button>
+
                     )}
 
                   </div>
 
+
                   {/* IMAGE */}
+
                   {post.image_url && (
-                    <div className="bg-gray-50">
+
+                    <div className="w-full bg-gray-50">
+
                       <img
                         src={post.image_url}
                         alt="Фото поста"
-                        className="max-h-[700px] w-full object-contain"
+                        className="max-h-[75vh] w-full object-contain"
                       />
+
                     </div>
+
                   )}
 
+
                   {/* TEXT */}
+
                   {post.caption && (
-                    <div className="px-5 pb-6 pt-5 sm:px-6">
-                      <p className="whitespace-pre-wrap break-words text-base leading-7 text-gray-800 sm:text-lg">
+
+                    <div className="px-4 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5">
+
+                      <p className="whitespace-pre-wrap break-words text-[15px] leading-6 text-gray-800 sm:text-lg sm:leading-7">
                         {post.caption}
                       </p>
+
                     </div>
+
                   )}
 
                 </article>
+
               );
             })}
 
           </div>
+
         )}
 
       </section>
+
     </main>
   );
 }
